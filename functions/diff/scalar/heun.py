@@ -24,11 +24,3 @@ def heun(f,a,b,alpha,n):
 
     return w
 
-f = lambda t,y: y - t**2 + 1
-a = 0 
-b = 2
-alpha = 0.5
-n = 10
-
-S = heun(f,a,b,alpha,n)  
-print(S)

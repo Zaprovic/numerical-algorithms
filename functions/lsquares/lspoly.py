@@ -37,11 +37,4 @@ def plot(x, y, P):
     return plt.show()
 
 
-x = [-3, -1, 2, 3, 7]
-y = [5, 4, 12, 6, 0]
 
-x = np.linspace(0.1, 1, 20)
-y = [x[k] + np.cos(np.sqrt(k+1)) for k in range(len(x))]
-n = 3
-L = lspoly(x, y, n)
-c = plot(x, y, L)

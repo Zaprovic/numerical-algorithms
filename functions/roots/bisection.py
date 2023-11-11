@@ -42,12 +42,3 @@ def bisection(f, a, b, delta):
     return f'Method failed after {n0} iterations'
 
 
-def f(x): return x * np.exp(x)
-
-
-a = 0
-b = 1
-delta = 1e-5
-
-s = bisection(f, a, b, delta)
-print(s)

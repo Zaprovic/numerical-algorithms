@@ -82,19 +82,3 @@ def linear_shot(p, q, r, a, b, alpha, beta, n, plot=None):
         return w
 
     return w
-
-
-def p(t): return 1/t
-def q(t): return 3/t**2
-def r(t): return np.log(t)/t + 1
-
-
-a = 1
-b = 2
-alpha = 0
-beta = 0
-n = 10
-
-R = linear_shot(p, q, r, a, b, alpha, beta, n, plot="continuous")
-
-print(R)

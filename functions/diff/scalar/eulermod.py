@@ -26,14 +26,4 @@ def eulermod(f, a, b, alpha, n):
     return w
 
 
-def f(t, y): return (4*y*t**2)/(1+t**4)
 
-
-a = 0
-b = 2
-alpha = 1
-h = 0.2
-n = int((b-a) / h)
-
-S = eulermod(f, a, b, alpha, n)
-print(S)
