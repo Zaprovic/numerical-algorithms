@@ -1,0 +1,6 @@
+env/
+.matlab/
+notes/
+.idea/
+.vscode/
+main/
