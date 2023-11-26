@@ -1,34 +1,52 @@
 import numpy as np
 
-
-def forward(alpha, l, tn, N, M, f=None, g1=None, g2=None):
-    """
-    Parameters: Equation of the form ut(x,t) = alpha^2 uxx(x,t)
-    Boundary conditions: u(x,0) = f(x) / u(0,t) = g1(t), u(l,t) = g2(t)
-    Returns
-    -------
-    """
-
-    # step sizes
-    h = l / N
-    k = tn / M
-    lamda = alpha**2 * k / h**2
-
-    D = np.diag([1-2*lamda for i in range(N+1)])
-    U = np.diag([i+1 for i in range(N)], k=1)
-    L = np.diag([i+1 for i in range(N)], k=-1)
-
-    A = D + L + U
-
-    return A
+np.set_printoptions(suppress=True)
 
 
-alpha = 3
-l = 5
-tn = 3
-N = 5
-M = 5
+def forward2(f, g1, g2, xa, xb, ta, tb, h, k):
+    N = round((xb-xa) / h)
+    M = round((tb-ta) / k)
 
-R = forward(alpha, l, tn, N, M)
+    lmbda = alpha**2 * k / h**2
+    x = np.linspace(xa, xb, N+1)
+    t = np.linspace(ta, tb, M+1)
+    w = np.zeros((len(t), len(x)))
 
-print(R)
+    w[0] = [f(x[i]) for i in range(N+1)]
+    w[1:, 0] = [g1(t[i]) for i in range(1, M+1)]
+    w[1:, -1] = [g2(t[i]) for i in range(1, M+1)]
+
+    # w[1, 1] = lmbda * w[0, 2] + (1 - 2*lmbda)*w[0, 1] + lmbda*w[0, 0]
+    # w[1, 2] = lmbda * w[0, 3] + (1 - 2*lmbda)*w[0, 2] + lmbda*w[0, 1]
+    # w[1, 3] = lmbda * w[0, 4] + (1 - 2*lmbda)*w[0, 3] + lmbda*w[0, 2]
+
+    for j in range(M):
+        for i in range(1, N):
+            w[j+1, i] = lmbda * w[j, i+1] + \
+                (1-2*lmbda)*w[j, i] + lmbda*w[j, i-1]
+
+    return w
+
+
+# x interval
+xa = 0
+xb = 2
+
+# t interval
+ta = 0
+tb = 0.6
+
+alpha = 4
+h = 0.5
+k = 0.2
+
+# boundary conditions
+
+
+def f(x): return np.sin(np.pi*x/4)
+def g1(t): return 0
+def g2(t): return np.exp(-np.pi**2 * t)
+
+
+S = forward2(f, g1, g2, xa, xb, ta, tb, h, k)
+print(S)
