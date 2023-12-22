@@ -1,9 +1,10 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 np.set_printoptions(suppress=True)
 
 
-def forward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
+def forward(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
     N = round((xb-xa) / h)
     M = round((tb-ta) / k)
 
@@ -19,6 +20,16 @@ def forward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
     for j in range(M):
         for i in range(1,N):
             w[j+1, i] = l*(w[j, i+1] - 2*w[j, i] + w[j, i-1]) + w[j, i]
+
+    if plot is not None:
+        X,T = np.meshgrid(x,t)
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot_surface(X, T, w, cmap='plasma')  # choose a colormap you like
+        ax.set_xlabel('x')
+        ax.set_ylabel('t')
+        ax.set_zlabel('u(x, t)')
+        plt.show()
 
     return w
 
