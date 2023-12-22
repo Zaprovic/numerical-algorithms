@@ -12,7 +12,7 @@ def forward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
     t = np.linspace(ta, tb, M+1)
     w = np.zeros((len(t), len(x)))
 
-    w[0] = [f(x[i]) for i in range(N+1)]
+    w[0] = f(x)
     w[1:, 0] = [g1(t[i]) for i in range(1, M+1)]
     w[1:, -1] = [g2(t[i]) for i in range(1, M+1)]
 

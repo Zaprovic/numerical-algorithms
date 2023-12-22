@@ -1,4 +1,7 @@
 import numpy as np
+from scipy.sparse import diags
+from scipy.sparse.linalg import spsolve
+from scipy.sparse import csr_matrix
 
 np.set_printoptions(suppress=True)
 
@@ -12,27 +15,25 @@ def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
     t = np.linspace(ta, tb, M+1)
     w = np.zeros((len(t), len(x)))
 
-    w[0] = [f(x[i]) for i in range(N+1)]
-    w[1:, 0] = [g1(t[i]) for i in range(1, M+1)]
-    w[1:, -1] = [g2(t[i]) for i in range(1, M+1)]
+    w[0] = f(x)
+    w[1:, 0] = g1(t[1:])
+    w[1:, -1] = g2(t[1:])
 
     # declare tri-diagonal matrix
-    D = np.diag([1 + 2*l for i in range(N-1)])
-    L = np.diag([-l for i in range(N-2)], k=-1)
-    U = np.diag([-l for i in range(N-2)], k=1)
-    T = D + L + U
+    T = diags([1 + 2*l, -l, -l], [0, -1, 1], shape=(N-1, N-1))
+    T = csr_matrix(T)
 
     # vector to allocate all the right hand vectors of the system that needs to be solved for each i
     v = np.zeros((M,N-1))
 
     # iterate over v to update the values in a loop
-    for j in range(1,M+1):
-        vb = np.zeros(N-1)
+    vb = np.zeros(N-1)
+    for j in range(1, M+1):
+        vb.fill(0)
         vb[0] = w[j,0]
         vb[-1] = w[j,N]
-
-        v[j-1] = [w[j-1,i] for i in range(1,N)] + l*vb
-        w[j,1:-1] = np.linalg.solve(T, v[j-1])
+        v[j-1] = w[j-1,1:N] + l*vb
+        w[j,1:-1] = spsolve(T, v[j-1])
 
     return w
 
