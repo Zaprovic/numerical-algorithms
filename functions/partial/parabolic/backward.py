@@ -1,12 +1,12 @@
 import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
-from scipy.sparse import csr_matrix
+import matplotlib.pyplot as plt
 
 np.set_printoptions(suppress=True)
 
 
-def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
+def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
     N = round((xb-xa) / h)
     M = round((tb-ta) / k)
 
@@ -20,8 +20,7 @@ def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
     w[1:, -1] = g2(t[1:])
 
     # declare tri-diagonal matrix
-    T = diags([1 + 2*l, -l, -l], [0, -1, 1], shape=(N-1, N-1))
-    T = csr_matrix(T)
+    J = diags([1 + 2*l, -l, -l], [0, -1, 1], shape=(N-1, N-1)).tocsc()
 
     # vector to allocate all the right hand vectors of the system that needs to be solved for each i
     v = np.zeros((M,N-1))
@@ -33,7 +32,17 @@ def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k):
         vb[0] = w[j,0]
         vb[-1] = w[j,N]
         v[j-1] = w[j-1,1:N] + l*vb
-        w[j,1:-1] = spsolve(T, v[j-1])
+        w[j,1:-1] = spsolve(J, v[j-1])
+
+    if plot is not None:
+        X,T = np.meshgrid(x,t)
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot_surface(X, T, w, cmap='plasma')  # choose a colormap you like
+        ax.set_xlabel('x')
+        ax.set_ylabel('t')
+        ax.set_zlabel('u(x, t)')
+        plt.show()
 
     return w
 
