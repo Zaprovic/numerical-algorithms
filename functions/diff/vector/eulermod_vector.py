@@ -13,9 +13,3 @@ def euler_vector(F, a, b, alpha, n):
                                  np.array(F(t[i+1], W[i] + h*np.array(F(t[i], W[i])))))
 
     return W
-
-
-
-
-
-

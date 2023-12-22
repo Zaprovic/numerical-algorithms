@@ -35,6 +35,3 @@ def plot(x, y, P):
     plt.plot(xx, yy, linewidth=1.5)
 
     return plt.show()
-
-
-

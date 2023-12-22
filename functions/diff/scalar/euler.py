@@ -36,6 +36,3 @@ def euler(f, a, b, alpha, n):
         plt.show()
 
     return w
-
-
-

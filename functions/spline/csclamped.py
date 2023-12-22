@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def csclamped(x, y, f1, f2):
     """
     Parameters
@@ -56,5 +57,3 @@ def csclamped(x, y, f1, f2):
     S = np.column_stack((a[0:-1], b, c[0:-1], d))
 
     return S
-
-

@@ -40,5 +40,3 @@ def bisection(f, a, b, delta):
             b = p
 
     return f'Method failed after {n0} iterations'
-
-

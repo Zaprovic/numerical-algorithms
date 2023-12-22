@@ -39,6 +39,3 @@ def newtonpoly(x, y):
             P[j] = F[j, j] + (x[i] - x[j]) * P[j + 1]
 
     return F, P
-
-
-

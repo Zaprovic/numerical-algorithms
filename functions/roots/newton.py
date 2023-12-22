@@ -15,7 +15,7 @@ m : Maximum number of iterations
 
 
 def newton(f, x0, delta, epsilon, m):
-    df = lambda x: derivative(f, x, dx=1e-6)
+    def df(x): return derivative(f, x, dx=1e-6)
 
     for i in range(m + 1):
         p = x0 - f(x0) / df(x0)

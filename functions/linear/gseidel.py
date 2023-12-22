@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def gseidel(A, b, x0, epsilon, max):
     A = np.array(A)
     b = np.array(b).reshape(-1, 1)

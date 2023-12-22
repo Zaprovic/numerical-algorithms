@@ -28,6 +28,3 @@ def rk4(f, a, b, alpha, n):
         plt.show()
 
     return w
-
-
-

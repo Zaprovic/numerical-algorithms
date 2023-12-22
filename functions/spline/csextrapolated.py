@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def csextrapolated(x, y):
     n = len(x) - 1  # so we can have a set of points from x0,x1,x2,...,xn
 
@@ -37,9 +38,6 @@ def csextrapolated(x, y):
                   (2*c[i] + c[i+1])/3 for i in range(n)])
     d = np.array([(c[i+1] - c[i])/(3*h[i]) for i in range(n)])
 
-
     S = np.column_stack((a[0:-1], b, c[0:-1], d))
 
     return S
-
-

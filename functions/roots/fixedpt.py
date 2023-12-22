@@ -28,4 +28,3 @@ def fixedpt(g, p0, tol, m):
         return 'Maximum number of iterations was exceeded'
 
     return f'Root: {p}\nIteration: {k+1}\nAbsolute error: {e}\nSequence: {P[1:]}'
-

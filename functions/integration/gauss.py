@@ -21,6 +21,3 @@ def gauss(f, a, b, n):
     F = np.multiply(c, F)
 
     return (b-a)*sum(F)/2
-
-
-

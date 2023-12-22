@@ -14,8 +14,8 @@ tol : Maximum desired tolerance for the output
 
 def newtonMod(f, x0, delta, epsilon, m):
 
-    df = lambda x: derivative(f, x, dx=1e-6)
-    d2f = lambda x: derivative(df, x, dx=1e-6)
+    def df(x): return derivative(f, x, dx=1e-6)
+    def d2f(x): return derivative(df, x, dx=1e-6)
 
     for i in range(m + 1):
         p = x0 - (f(x0) * df(x0)) / (df(x0) ** 2 - f(x0) * d2f(x0))

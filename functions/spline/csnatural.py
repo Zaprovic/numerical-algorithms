@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def csnatural(x, y):
     n = len(x) - 1  # so we can have a set of points from x0,x1,x2,...,xn
 
@@ -32,4 +33,3 @@ def csnatural(x, y):
     S = np.column_stack((a[0:-1], b, c[0:-1], d))
 
     return S
-
