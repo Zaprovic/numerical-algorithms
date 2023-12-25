@@ -48,14 +48,14 @@ def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k ,plot=None):
     trd = diags([-2*(1+l),1,1], [0,-1,1], shape=(N-1,N-1), format="csr")
     off = diags([l,0,0], [0,-1,1], shape=(N-1,N-1), format="csr")
 
-    T = bmat([
+    T = csr_matrix(bmat([
         [None]*(M-1-M) + [trd, off] + [None]*(M-1-2),
         *[[None]*(i-3) + [off, trd, off] + [None]*(M-1-i) for i in range(3, M)],
         [None] * (M-1-2) + [off, trd] + [None]*(M-1-M)
-    ], format="csr")
+    ]))
 
     # vector to store the solutions for f(xi,yj)
-    F = np.array([f(x[i],y[j]) for j in range(1,M) for i in range(1,N)])
+    F = csr_matrix([f(x[i],y[j]) for j in range(1,M) for i in range(1,N)]).toarray().ravel()
 
     G = csr_matrix([
         [w[0, 1] + l * w[1, 0]] + [0 + l * w[i, 0] for i in range(2, N - 1)] + [w[N, 1] + l * w[N - 1, 0]],
@@ -66,18 +66,16 @@ def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k ,plot=None):
     S = np.power(h,2)*F - G
 
     xs = lil_matrix(spsolve(T,S)).reshape((M-1,N-1)).transpose()
-
-    for k in range(1,N):
-        w[k,1:-1] = xs[k-1]
+    w[1:-1,1:-1] = xs
 
     if plot is not None:
         X, Y = np.meshgrid(x, y)
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.plot_surface(X, Y, w.T, cmap='plasma')
+        ax.plot_surface(X, Y, w.toarray().T, cmap='plasma')
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.set_zlabel('u(x, y)')
         plt.show()
 
-    return w.toarray()
+    return T.shape
