@@ -1,7 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
+
 
 def forward(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
     N = round((xb-xa) / h)
@@ -31,6 +32,7 @@ def forward(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
         plt.show()
 
     return w
+
 
 def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
     N = round((xb-xa) / h)
@@ -71,6 +73,7 @@ def backward(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
         plt.show()
 
     return w
+
 
 def crnich(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
     N = round((xb-xa) / h)
