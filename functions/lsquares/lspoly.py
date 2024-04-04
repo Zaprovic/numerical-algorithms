@@ -30,8 +30,8 @@ def plot(x, y, P):
     xx = np.linspace(x[0], x[-1], 1500)
     yy = [np.polyval(P, xx[i]) for i in range(len(xx))]
 
-    plt.grid()
-    plt.scatter(x, y, c="k")
-    plt.plot(xx, yy, linewidth=1.5)
+    # plt.grid()
+    plt.scatter(x, y, c="k", marker=".")
+    plt.plot(xx, yy, linewidth=2)
 
     return plt.show()
