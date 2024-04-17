@@ -204,10 +204,15 @@ def csparabolic(x, y):
 
     return S
 
-def csplot(x, y, S, title=None):
+def csplot(x, y, S, title=None, size=None):
     S = np.fliplr(S)
     n = len(x) - 1
     # plt.grid()
+
+    plt.style.use("ggplot")
+
+    if size is not None:
+        plt.figure(figsize=size)
 
     for i in range(n):
         xx = np.linspace(x[i], x[i+1], 1500)
