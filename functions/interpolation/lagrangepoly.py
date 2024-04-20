@@ -4,7 +4,7 @@ import numpy as np
 np.set_printoptions(suppress=True)
 
 
-def lagrangepoly(x, y):
+def lagrange(x, y):
     n = len(x)
     y = np.array(y)
 
@@ -45,14 +45,3 @@ def lagrangepoly(x, y):
         c += Lk[i]*y[i]
 
     return c, Lk
-
-
-# Example usage
-x = [0, 3, 5, 8, 13]
-y = [0, 225, 383, 623, 993]
-
-C, L = lagrangepoly(x, y)
-
-print(C)
-print("")
-print(L)
