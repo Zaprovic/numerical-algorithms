@@ -1,21 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# y' = f(t,y)
+# a <= t <= b,  y(a) = alpha
+
 
 def euler(f, a, b, alpha, n):
-    """
-    Parameters
-    ----------
-    f
-    a
-    b
-    alpha: Initial condition
-    n
-
-    Returns
-    -------
-
-    """
     h = (b-a) / n
 
     t = np.linspace(a, b, n+1)
@@ -25,7 +15,7 @@ def euler(f, a, b, alpha, n):
     for i in range(n):
         w[i+1] = w[i] + h*f(t[i], w[i])
 
-    plt.grid()
+    plt.style.use("ggplot")
     if h >= 0.1:
         plt.scatter(t, w, c='k', marker='.')
         plt.plot(t, w)
