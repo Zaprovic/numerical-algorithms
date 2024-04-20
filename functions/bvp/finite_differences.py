@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ..spline import csnatural as cs
-from ..spline import csplot
-
 plt.style.use('seaborn-v0_8-dark')
 
 
