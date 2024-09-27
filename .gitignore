@@ -4,4 +4,4 @@ notes/
 .idea/
 .vscode/
 main/
-__pycache__/
+__pycache__/.env
