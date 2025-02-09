@@ -26,8 +26,8 @@ def gseidel(A, b, x0, epsilon, max):
     rho = np.max(eig)
 
     if rho > 1:
-        print(f'The system will not converge\nSpectral radius is {rho}')
+        print(f"The system will not converge\nSpectral radius is {rho}")
     else:
-        print(f'The system will converge\nSpectral radius is {rho}\n')
+        print(f"The system will converge\nSpectral radius is {rho}\n")
 
     return x

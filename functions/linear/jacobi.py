@@ -8,10 +8,10 @@ def jacobi(A, b, x0, epsilon, max):
 
     n = len(A)
     D = np.diag(np.diag(A))
-    U = (np.triu(A) - D)
-    L = (np.tril(A) - D)
+    U = np.triu(A) - D
+    L = np.tril(A) - D
 
-    Tj = -np.linalg.inv(D) @ (L+U)
+    Tj = -np.linalg.inv(D) @ (L + U)
     cj = np.linalg.inv(D) @ b
 
     for i in range(max):
@@ -28,9 +28,9 @@ def jacobi(A, b, x0, epsilon, max):
     rho = np.max(eig)
 
     if rho > 1:
-        print(f'The system will not converge\nSpectral radius is {rho}')
+        print(f"The system will not converge\nSpectral radius is {rho}")
 
     else:
-        print(f'The system will converge\nSpectral radius is {rho}\n')
+        print(f"The system will converge\nSpectral radius is {rho}\n")
 
     return x

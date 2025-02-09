@@ -106,7 +106,7 @@ def crnich(f, alpha, g1, g2, xa, xb, ta, tb, h, k, plot=None):
 
     if plot is not None:
         X, T = np.meshgrid(x, t)
-        fig = plt.figure()
+        fig = plt.figure(figsize=(8,8))
         ax = fig.add_subplot(111, projection='3d')
         ax.plot_surface(X, T, w, cmap='plasma')
         ax.set_xlabel('x')

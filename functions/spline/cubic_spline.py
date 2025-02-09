@@ -207,8 +207,6 @@ def csparabolic(x, y):
 def csplot(x, y, S, title=None, size=None):
     S = np.fliplr(S)
     n = len(x) - 1
-    # plt.grid()
-
     plt.style.use("ggplot")
 
     if size is not None:
@@ -221,8 +219,9 @@ def csplot(x, y, S, title=None, size=None):
         plt.plot(xx, yy, linewidth=2.5)
 
     plt.scatter(x, y, c="k")
+    
     if title is not None:
-        plt.title(f"Cubic spline interpolation: {title}")
+        plt.title(title)
 
     else:
         plt.title("Cubic spline interpolation")
