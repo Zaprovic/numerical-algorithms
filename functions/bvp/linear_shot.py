@@ -1,5 +1,5 @@
 import numpy as np
-from ..diff.vector import rk4
+from ..diff.vector import solve_ode_system
 
 
 def linear_shot(p, q, r, a, b, alpha, beta, n):
@@ -14,8 +14,8 @@ def linear_shot(p, q, r, a, b, alpha, beta, n):
     def F2(t, v):
         return np.array([v[1], q(t) * v[0] + p(t) * v[1]])
 
-    yu = rk4(F1, a, b, [alpha, 0], n)
-    yv = rk4(F2, a, b, [0, 1], n)
+    yu = solve_ode_system(F1, a, b, [alpha, 0], n, "rk4")
+    yv = solve_ode_system(F2, a, b, [0, 1], n, "rk4")
 
     u = yu[0, -1]
     v = yv[0, -1]
