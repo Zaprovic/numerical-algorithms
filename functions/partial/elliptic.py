@@ -30,8 +30,8 @@ def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k, plot=None):
     -------
     """
 
-    N = round((xb - xa) / h)
-    M = round((yb - ya) / k)
+    N = int((xb - xa) / h)
+    M = int((yb - ya) / k)
 
     x = np.linspace(xa, xb, N + 1)
     y = np.linspace(ya, yb, M + 1)
@@ -102,4 +102,4 @@ def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k, plot=None):
         ax.set_zlabel("u(x, y)")
         plt.show()
 
-    return T.shape
+    return T
