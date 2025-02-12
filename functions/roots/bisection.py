@@ -1,19 +1,20 @@
 import numpy as np
 import pandas as pd
+from typing import Callable
 
 
-def helper():
-    return """Bisection method for transcendental equations
-    
-Function : bisection(f,s a, b , tol)
-f : Function must be created as a Python function or using lambdas
-a : Left side of the interval
-b : Right side of the interval
-tol : Maximum desired tolerance for the output
-"""
+def bisection(
+    f: Callable[[float], float], a: float, b: float, delta: float
+) -> pd.DataFrame:
+    """
+    Bisection method for finding roots of a function
 
-
-def bisection(f, a, b, delta):
+    Function : bisection(f, a, b, delta)
+    f : Function must be created as a Python function or using lambdas (make sure to use sympy instead of numpy to declare special functions such as exp, sin, etc)
+    a : Lower bound of the interval
+    b : Upper bound of the interval
+    delta : Maximum error that satisfies f(pn) < epsilon
+    """
     if f(a) * f(b) > 0:
         raise ValueError("There is no root in the interval")
 

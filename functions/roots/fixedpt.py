@@ -1,18 +1,17 @@
 import numpy as np
+from typing import Callable
 
 
-def helper():
-    return """Fixed point iteration method for transcendental equations in the form of x = g(x)
-    
-Function : fixedpt(g, p0, tol, m)
-g : Function must be created as a Python function or using lambdas
-p0 : Initial guess for the root
-tol : Maximum allowed tolerance
-m : Maximum numbers of iterations
-"""
+def fixedpt(g: Callable[[float], float], p0: float, tol: float, m: int) -> str:
+    """
+    Fixed point iteration for finding roots of a function
 
-
-def fixedpt(g, p0, tol, m):
+    Function : fixedpt(g, p0, tol, m)
+    g : Function must be created as a Python function or using lambdas (make sure to use sympy instead of numpy to declare special functions such as exp, sin, etc)
+    p0 : Initial approximation of the root
+    tol : Maximum error that satisfies f(pn) < epsilon
+    m : Maximum number of iterations
+    """
 
     P = [p0]
 
