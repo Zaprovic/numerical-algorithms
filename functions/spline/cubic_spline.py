@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import numpy.typing as npt
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
+from scipy.sparse import diags
 
 
 def csextrapolated(x, y):
@@ -75,7 +75,7 @@ class CubicSpline:
         ] = "natural",
         f1: Optional[float] = None,
         f2: Optional[float] = None,
-    ):
+    ) -> None:
         self.x = np.asarray(x, dtype=float)
         self.y = np.asarray(y, dtype=float)
         self._h: npt.ArrayLike = np.diff(x)
@@ -94,35 +94,21 @@ class CubicSpline:
 
         self.coefficients = self._compute_coeffs()
 
-    def _compute_coeffs(self):
+    def _compute_coeffs(self) -> None:
         h = self._h
-
         B = self._build_B()
         A = self._build_A()
-
         c = self._solve_for_c(A, B)
 
         a = self.y[:-1]
-        b = np.zeros(self._n)
-        d = np.zeros(self._n)
-
-        for i in range(self._n):
-            b[i] = (self.y[i + 1] - self.y[i]) / h[i] - (h[i] / 3.0) * (
-                2 * c[i] + c[i + 1]
-            )
-            d[i] = (c[i + 1] - c[i]) / (3 * h[i])
+        b = (self.y[1:] - self.y[:-1]) / h - h * (2 * c[:-1] + c[1:]) / 3
+        d = (c[1:] - c[:-1]) / (3 * h)
 
         # Store internally
-        self._a = a
-        self._b = b
-        self._c = c[:-1]  # note: c has length n+1, but interval i uses c[i]
-        self._d = d
+        self._a, self._b, self._c, self._d = a, b, c[:-1], d
 
-        return np.column_stack((d, c[:-1], b, a))
-
-    def _build_B(self):
-        n = self._n
-        h = self._h
+    def _build_B(self) -> np.ndarray:
+        n, h, y = self._n, self._h, self.y
         B = np.zeros(n - 1)
 
         if self.bc_type in ["natural", "parabolic", "extrapolated"]:
@@ -145,14 +131,12 @@ class CubicSpline:
         elif self.bc_type == "clamped":
             if self.f1 is None or self.f2 is None:
                 raise ValueError("bc_type='clamped' needs f1, f2 (end derivatives).")
-            # B[0]
             B[0] = (
                 3 * (self.y[2] - self.y[1]) / self._h[1]
                 - 3 * (self.y[1] - self.y[0]) / self._h[0]
                 - (3 / (2 * self._h[0])) * (self.y[1] - self.y[0])
                 + 3 * self.f1 / 2
             )
-            # B[-1]
             B[-1] = (
                 3 * (self.y[n] - self.y[n - 1]) / self._h[n - 1]
                 - 3 * (self.y[n - 1] - self.y[n - 2]) / self._h[n - 2]
@@ -204,7 +188,7 @@ class CubicSpline:
 
         return np.array(B)
 
-    def _build_A(self):
+    def _build_A(self) -> np.ndarray:
         n = self._n
         h = self._h
 
@@ -212,31 +196,33 @@ class CubicSpline:
         U = np.diag([self._h[i] for i in range(1, n - 1)], k=1)
         L = np.diag([self._h[i] for i in range(1, n - 1)], k=-1)
 
-        if self.bc_type == "natural":
-            pass
+        # Main diagonal (D)
+        D = [2 * (h[i] + h[i + 1]) for i in range(n - 1)]
 
-        elif self.bc_type == "clamped":
-            D[0, 0] = 2 * (h[0] + h[1]) - h[0] / 2
-            D[-1, -1] = 2 * (h[n - 2] + h[n - 1]) - h[n - 1] / 2
+        # Upper and lower diagonals (U and L)
+        U = [h[i] for i in range(1, n - 1)]
+        L = [h[i] for i in range(1, n - 1)]
+
+        if self.bc_type == "clamped":
+            D[0] = 2 * (h[0] + h[1]) - h[0] / 2
+            D[-1] = 2 * (h[n - 2] + h[n - 1]) - h[n - 1] / 2
 
         elif self.bc_type == "extrapolated":
-            D[0, 0] = h[0] + h[0] ** 2 / h[1] + 2 * (h[0] + h[1])
-            D[-1, -1] = 2 * h[n - 2] + 3 * h[n - 1] + h[n - 1] ** 2 / h[n - 2]
+            D[0] = h[0] + h[0] ** 2 / h[1] + 2 * (h[0] + h[1])
+            D[-1] = 2 * h[n - 2] + 3 * h[n - 1] + h[n - 1] ** 2 / h[n - 2]
 
-            U[0, 1] = -h[0] ** 2 / h[1] + h[1]
-            L[-1, 1] = h[n - 2] - h[n - 1] ** 2 / h[n - 2]
-
-        elif self.bc_type == "known":
-            pass
+            U[0] = -h[0] ** 2 / h[1] + h[1]
+            L[-1] = h[n - 2] - h[n - 1] ** 2 / h[n - 2]
 
         elif self.bc_type == "parabolic":
-            D[0, 0] = 3 * self._h[0] + 2 * self._h[1]
-            D[-1, -1] = 3 * self._h[n - 1] + 2 * self._h[n - 2]
+            D[0] = 3 * self._h[0] + 2 * self._h[1]
+            D[-1] = 3 * self._h[n - 1] + 2 * self._h[n - 2]
 
-        A = U + D + L
+        # A = U + D + L
+        A = diags([L, D, U], offsets=[-1, 0, 1]).toarray()
         return A
 
-    def _solve_for_c(self, A, B):
+    def _solve_for_c(self, A, B) -> np.ndarray:
         h = self._h
         n = self._n
         # Solve the interior system for c[1..n-1]
@@ -286,27 +272,10 @@ class CubicSpline:
         c = np.concatenate(([c0], c_interior, [cN]))
         return c
 
-    def __call__(self, xq):
-        if self._a is None or self._b is None or self._c is None or self._d is None:
-            raise RuntimeError("Must call ._compute_coeffs() before evaluating.")
-
+    def __call__(self, xq: Union[float, npt.ArrayLike]) -> np.ndarray:
         xq = np.asarray(xq)
-        yq = np.zeros_like(xq, dtype=float)
-
-        for j, xval in enumerate(xq):
-            # Find i such that x[i] <= xval <= x[i+1].
-            # You can do a binary search or just np.searchsorted:
-            i = np.searchsorted(self.x, xval) - 1
-            if i < 0:
-                i = 0
-            if i > self._n - 1:
-                i = self._n - 1
-            dx = xval - self.x[i]
-            yq[j] = (
-                self._a[i]
-                + self._b[i] * dx
-                + self._c[i] * (dx**2)
-                + self._d[i] * (dx**3)
-            )
-
-        return yq
+        i = np.clip(
+            np.searchsorted(self.x, xq) - 1, 0, self._n - 1
+        )  # Vectorized search
+        dx = xq - self.x[i]
+        return self._a[i] + self._b[i] * dx + self._c[i] * dx**2 + self._d[i] * dx**3
