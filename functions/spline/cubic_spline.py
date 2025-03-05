@@ -92,7 +92,7 @@ class CubicSpline:
         self._c = None
         self._d = None
 
-        self.coefficients = self._compute_coeffs()
+        self._compute_coeffs()
 
     def _compute_coeffs(self) -> None:
         h = self._h
