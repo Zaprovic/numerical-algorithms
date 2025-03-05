@@ -62,12 +62,10 @@ def closed_newton_cotes(
 
     A = np.vander(x, increasing=True).T
 
-    # Compute the right-hand side vector (integrals of monomials)
     v = np.zeros(n + 1)
     for i in range(n + 1):
         v[i] = (b ** (i + 1) - a ** (i + 1)) / (i + 1)  # Integral of x^i from a to b
 
-    # Calculate quadrature weights
     r = np.linalg.solve(A, v)
     S = np.dot(r, y)
 
@@ -200,7 +198,7 @@ def closed_composite_newton_cotes(
         )
 
     h = (b - a) / n
-    result = 0.0
+    result = 0
 
     for i in range(0, n, order):
         subinterval_a = a + i * h
