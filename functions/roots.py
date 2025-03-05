@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from typing import Callable, Tuple
 
+np.set_printoptions(precision=4)
+
 
 def _numerical_derivative(f: Callable[[float], float], x: float) -> float:
     h = 1e-6

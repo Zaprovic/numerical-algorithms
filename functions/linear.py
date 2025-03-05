@@ -1,6 +1,8 @@
 import numpy as np
 from typing import Tuple, Optional, Dict, Any
 
+np.set_printoptions(precision=4)
+
 
 def jacobi(
     A: np.ndarray,

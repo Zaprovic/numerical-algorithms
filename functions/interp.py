@@ -1,5 +1,7 @@
 import numpy as np
 
+np.set_printoptions(precision=4)
+
 
 def lagrange(x: list[float], y: list[float]) -> tuple[np.ndarray, np.ndarray]:
     """
