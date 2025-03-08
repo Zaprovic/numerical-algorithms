@@ -16,12 +16,6 @@ def _numerical_second_derivative(
     return (f(x + h) - 2 * f(x) + f(x - h)) / (h**2)
 
 
-def _numerical_second_derivative(
-    f: Callable[[float], float], x: float, h: float = 1e-6
-) -> float:
-    return (f(x + h) - 2 * f(x) + f(x - h)) / (h**2)
-
-
 def bisect(
     f: Callable[[float], float], a: float, b: float, delta: float = 1e-6
 ) -> pd.DataFrame:

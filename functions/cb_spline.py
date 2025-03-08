@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.typing as npt
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, Tuple
 from scipy.sparse import diags
 
 np.set_printoptions(precision=4)
@@ -19,19 +19,18 @@ class CubicSpline:
         1-D array of independent variable values in strictly ascending order.
     y : array_like
         1-D array of dependent variable values, same length as x.
-    bc_type : str, optional
+    bc_type : {'natural', 'clamped', 'known', 'parabolic', 'extrapolated'}, optional
         Specifies the boundary condition type. Options:
         - 'natural': Second derivatives at endpoints are zero (default)
-        - 'clamped': First derivatives at endpoints are specified by f1 and f2
-        - 'known': Second derivatives at endpoints are specified by f1 and f2
+        - 'clamped': First derivatives at endpoints are specified by bc
+        - 'known': Second derivatives at endpoints are specified by bc
         - 'parabolic': Boundary segments are parabolic (not cubic)
         - 'extrapolated': Extrapolates the first derivatives at endpoints
-    f1 : float, optional
-        Value of the first derivative at the first point (for 'clamped')
-        or second derivative (for 'known')
-    f2 : float, optional
-        Value of the first derivative at the last point (for 'clamped')
-        or second derivative (for 'known')
+    bc : tuple(float, float), optional
+        Tuple containing boundary condition values.
+        For 'clamped': values of the first derivatives at the endpoints.
+        For 'known': values of the second derivatives at the endpoints.
+        Default is (0.0, 0.0).
 
     Attributes
     ----------
@@ -77,7 +76,7 @@ class CubicSpline:
     >>> plt.show()
     >>>
     >>> # Example with clamped boundary conditions (specifying derivatives)
-    >>> cs_clamped = CubicSpline(x, y, bc_type='clamped', f1=0.0, f2=0.0)
+    >>> cs_clamped = CubicSpline(x, y, bc_type='clamped', bc=(0.0, 0.0))
     """
 
     def __init__(
@@ -87,15 +86,14 @@ class CubicSpline:
         bc_type: Literal[
             "natural", "clamped", "known", "parabolic", "extrapolated"
         ] = "natural",
-        f1: Optional[float] = None,
-        f2: Optional[float] = None,
+        bc: Tuple[float, float] = (0.0, 0.0),
     ) -> None:
         self.x = np.asarray(x, dtype=float)
         self.y = np.asarray(y, dtype=float)
         self._h: npt.ArrayLike = np.diff(x)
         self.bc_type = bc_type.lower().strip()
-        self.f1 = f1
-        self.f2 = f2
+        self.f1 = bc[0]
+        self.f2 = bc[1]
 
         self._n = len(x) - 1  # number of intervals
         if self._n < 1:
