@@ -1,5 +1,5 @@
 import numpy as np
-from .diff_equations.pvi import vector_ode as sd
+from .pvi import vector_ode as sd
 from typing import Callable, Tuple
 
 
