@@ -1,7 +1,8 @@
 import numpy as np
+from typing import Union
 
 
-def lspoly(x, y, n):
+def lspoly(x: np.ndarray, y: np.ndarray, n: int) -> np.ndarray:
     """
     Computes the coefficients of the least-squares polynomial approximation of degree n.
 
@@ -38,16 +39,44 @@ def lspoly(x, y, n):
     >>> lspoly(x, y, 2)
     array([1., 1., 1.])  # Represents y = 1*x^2 + 1*x + 1
     """
-    m = len(x)  # number of points in the discrete approximation
+    # Input validation
+    if n < 0:
+        raise ValueError("Polynomial degree must be non-negative")
+    if len(x) != len(y):
+        raise ValueError("Input arrays x and y must have the same length")
 
-    A = np.zeros((n + 1, n + 1))
+    # this is to avoid poorly conditioned matrix
+    if len(x) <= n:
+        raise ValueError(
+            f"Number of data points ({len(x)}) must be greater than polynomial degree ({n}). This is to avoid poorly conditioned matrix."
+        )
 
-    for i in range(n + 1):
-        for j in range(n + 1):
-            A[i, j] = sum(x[k] ** (2 * n - i - j) for k in range(m))
+    # Convert inputs to numpy arrays if they aren't already
+    x = np.asarray(x)
+    y = np.asarray(y)
 
-    B = [sum([x[j] ** (n - i) * y[j] for j in range(m)]) for i in range(n + 1)]
+    # Method 1: Using NumPy's polyfit (recommended approach)
+    # Note: polyfit returns coefficients in decreasing power order, which matches our docstring
+    coeffs = np.polynomial.Polynomial.fit(x, y, n)
+    return coeffs.convert().coef[::-1]
 
-    r = np.linalg.solve(A, B)
 
-    return r
+def eval_poly(
+    coeffs: np.ndarray, x: Union[np.ndarray, float]
+) -> Union[np.ndarray, float]:
+    """
+    Evaluates a polynomial with given coefficients at point(s) x.
+
+    Parameters
+    ----------
+    coeffs : array_like
+        Coefficients of the polynomial in descending order of powers
+    x : array_like or scalar
+        Points at which to evaluate the polynomial
+
+    Returns
+    -------
+    scalar or ndarray
+        Value(s) of the polynomial at x
+    """
+    return np.polyval(coeffs, x)
