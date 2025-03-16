@@ -95,7 +95,7 @@ class CubicSpline:
         self.f1 = bc[0]
         self.f2 = bc[1]
 
-        self._n = len(x) - 1  # number of intervals
+        self._n = len(x) - 1
         if self._n < 1:
             raise ValueError("Need at least two data points.")
 
@@ -143,7 +143,8 @@ class CubicSpline:
 
         elif self.bc_type == "clamped":
             if self.f1 is None or self.f2 is None:
-                raise ValueError("bc_type='clamped' needs f1, f2 (end derivatives).")
+                raise ValueError(
+                    "bc_type='clamped' needs f1, f2 (end derivatives).")
             B[0] = (
                 3 * (self.y[2] - self.y[1]) / h[1]
                 - 3 * (self.y[1] - self.y[0]) / h[0]
@@ -163,10 +164,12 @@ class CubicSpline:
 
         elif self.bc_type == "known":
             if self.f1 is None or self.f2 is None:
-                raise ValueError("bc_type='known' (known curvature) needs f1, f2.")
+                raise ValueError(
+                    "bc_type='known' (known curvature) needs f1, f2.")
 
             B[0] = (
-                3.0 * ((self.y[2] - self.y[1]) / h[1] - (self.y[1] - self.y[0]) / h[0])
+                3.0 * ((self.y[2] - self.y[1]) / h[1] -
+                       (self.y[1] - self.y[0]) / h[0])
                 - self.f1 * h[0] / 2.0
             )
             B[-1] = (
@@ -195,7 +198,6 @@ class CubicSpline:
         n = self._n
         h = self._h
 
-        # Initialize main diagonal and off-diagonals
         D = [2 * (h[i] + h[i + 1]) for i in range(n - 1)]
         U = [h[i + 1] for i in range(n - 2)] if n > 2 else []
         L = [h[i + 1] for i in range(n - 2)] if n > 2 else []
@@ -205,16 +207,13 @@ class CubicSpline:
             D[-1] = 2 * (h[n - 2] + h[n - 1]) - h[n - 1] / 2
 
         elif self.bc_type == "extrapolated":
-            # Correct the matrix for extrapolated boundary conditions
             D[0] = h[0] + h[0] ** 2 / h[1] + 2 * (h[0] + h[1])
             D[-1] = 2 * h[n - 2] + 3 * h[n - 1] + h[n - 1] ** 2 / h[n - 2]
 
             if n > 2:
-                # Adjust first element of upper diagonal
                 U = [h[i + 1] for i in range(n - 2)]
                 U[0] = -h[0] ** 2 / h[1] + h[1]
 
-                # Adjust last element of lower diagonal
                 L = [h[i + 1] for i in range(n - 2)]
                 L[-1] = h[n - 2] - h[n - 1] ** 2 / h[n - 2]
 
@@ -222,15 +221,12 @@ class CubicSpline:
             D[0] = 3 * h[0] + 2 * h[1]
             D[-1] = 3 * h[n - 1] + 2 * h[n - 2]
 
-        # Build the tridiagonal matrix using scipy's diags
         diagonals = []
         offsets = []
 
-        # Add main diagonal
         diagonals.append(D)
         offsets.append(0)
 
-        # Add off-diagonals if they exist
         if L:
             diagonals.append(L)
             offsets.append(-1)
@@ -244,14 +240,12 @@ class CubicSpline:
     def _solve_for_c(self, A, B) -> np.ndarray:
         h = self._h
         n = self._n
-        # Solve the interior system for c[1..n-1]
         c_interior = np.linalg.solve(A, B) if n > 1 else np.array([0.0])
 
         if self.bc_type == "natural":
             c0, cN = 0.0, 0.0
 
         elif self.bc_type == "clamped":
-            # c0, cN from your code snippet:
             c0 = (
                 3 * (self.y[1] - self.y[0]) / (2 * h[0] ** 2)
                 - 3 * self.f1 / (2 * h[0])
@@ -264,7 +258,8 @@ class CubicSpline:
             )
 
         elif self.bc_type == "extrapolated":
-            c0 = c_interior[0] - (h[0] / h[1]) * (c_interior[1] - c_interior[0])
+            c0 = c_interior[0] - (h[0] / h[1]) * \
+                (c_interior[1] - c_interior[0])
             cN = c_interior[n - 2] + (h[n - 1] / h[n - 2]) * (
                 c_interior[n - 2] - c_interior[n - 3]
             )
@@ -277,9 +272,6 @@ class CubicSpline:
             cN = 0.5 * self.f2
 
         elif self.bc_type == "parabolic":
-            # from your code, you effectively set c[0] = c_interior[0],
-            # c[n] = c_interior[-1], or something similar.
-            # We can do:
             c0 = c_interior[0]
             cN = c_interior[-1]
 
@@ -287,7 +279,6 @@ class CubicSpline:
             c0 = 0.0
             cN = 0.0
 
-        # Combine into single array
         c = np.concatenate(([c0], c_interior, [cN]))
         return c
 
