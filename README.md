@@ -51,7 +51,7 @@ Methods for finding roots (zeros) of nonlinear equations:
 
 - **`newton(f, x0, delta=1e-6, epsilon=1e-6, m=100)`**: Newton-Raphson method for fast convergence
 
-  - Iteratively improves approximation using x\_{n+1} = x_n - f(x_n)/f'(x_n)
+  - Iteratively improves approximation using $x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}$
   - Parameters:
     - `f`: The function for which to find a root
     - `x0`: Initial approximation
@@ -73,9 +73,41 @@ Methods for finding roots (zeros) of nonlinear equations:
 
 ### Linear Systems (`linear.py`)
 
-- `jacobi()`: Jacobi iterative method
-- `gseid()`: Gauss-Seidel iterative method
-- `sor()`: Successive Over-Relaxation method
+Methods for solving systems of linear equations using iterative approaches:
+
+- **`jacobi(A, b, x0, epsilon=1e-6, max_iter=100)`**: Jacobi iterative method
+
+  - Solves Ax = b using the formula: $\mathbf{x}^{(k+1)} = \mathbf{D}^{-1}(\mathbf{b} - (\mathbf{L}+\mathbf{U})\mathbf{x}^{(k)})$
+  - Parameters:
+    - `A`: Coefficient matrix (must be square with non-zero diagonal elements)
+    - `b`: Right-hand side vector
+    - `x0`: Initial guess for the solution vector
+    - `epsilon`: Convergence tolerance (default: 1e-6)
+    - `max_iter`: Maximum number of iterations (default: 100)
+  - Returns the solution vector, number of iterations performed, and final relative error
+
+- **`gseid(A, b, x0, epsilon=1e-6, max_iter=100)`**: Gauss-Seidel iterative method
+
+  - Solves Ax = b using the formula: $\mathbf{x}^{(k+1)} = (\mathbf{D}+\mathbf{L})^{-1}(\mathbf{b} - \mathbf{U}\mathbf{x}^{(k)})$
+  - Parameters:
+    - `A`: Coefficient matrix (must be square with non-zero diagonal elements)
+    - `b`: Right-hand side vector
+    - `x0`: Initial guess for the solution vector
+    - `epsilon`: Convergence tolerance (default: 1e-6)
+    - `max_iter`: Maximum number of iterations (default: 100)
+  - Returns the solution vector, number of iterations performed, and final relative error
+
+- **`sor(A, b, x0, omega, epsilon=1e-6, max_iter=100)`**: Successive Over-Relaxation method
+  - An accelerated version of the Gauss-Seidel method using a relaxation parameter
+  - Parameters:
+    - `A`: Coefficient matrix (must be square with non-zero diagonal elements)
+    - `b`: Right-hand side vector
+    - `x0`: Initial guess for the solution vector
+    - `omega`: Relaxation parameter (0 < omega < 2)
+    - `epsilon`: Convergence tolerance (default: 1e-6)
+    - `max_iter`: Maximum number of iterations (default: 100)
+  - Returns the solution vector, number of iterations performed, and final relative error
+  - Special cases: omega=1 corresponds to Gauss-Seidel method
 
 ### Interpolation (`interp.py` and `cb_spline.py`)
 
