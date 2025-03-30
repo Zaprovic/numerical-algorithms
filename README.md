@@ -111,17 +111,91 @@ Methods for solving systems of linear equations using iterative approaches:
 
 ### Interpolation (`interp.py` and `cb_spline.py`)
 
-- `lagrange()`: Lagrange polynomial interpolation
-- `newtonpoly()`: Newton's divided differences method
-- `chebyshevNodes()`: Generates Chebyshev nodes for optimal interpolation
+Methods for interpolating data points:
+
+- **`lagrange(x, y)`**: Lagrange polynomial interpolation
+
+  - Computes the Lagrange polynomial interpolation and its coefficients
+  - Parameters:
+    - `x`: List of x-coordinates of the data points
+    - `y`: List of y-coordinates of the data points
+  - Returns a tuple containing:
+    - The coefficients of the interpolation polynomial in descending order
+    - The Lagrange basis polynomials
+
+- **`newtonpoly(x, y)`**: Newton's divided differences method
+
+  - Computes the Newton form of the interpolating polynomial using divided differences
+  - Parameters:
+    - `x`: 1-D array of x-coordinates of the points
+    - `y`: 1-D array of y-coordinates of the points
+  - Returns:
+    - The coefficients of the Newton polynomial in descending order
+    - The divided difference table
+  - Especially useful for adding new points to an existing interpolation
+
+- **`chebyshevNodes(a, b, n, f)`**: Generates Chebyshev nodes for optimal interpolation
+
+  - Creates Chebyshev nodes in the interval [a, b] and computes function values at those nodes
+  - Parameters:
+    - `a`: Lower bound of the interval
+    - `b`: Upper bound of the interval
+    - `n`: Number of nodes
+    - `f`: Function to compute at the nodes
+  - Returns:
+    - The Chebyshev nodes
+    - Function values evaluated at the nodes
+  - Helps minimize Runge's phenomenon in polynomial interpolation
+
 - `CubicSpline`: Class implementing cubic spline interpolation with various boundary conditions
 
 ### Numerical Integration (`integration.py`)
 
-- `closed_newton_cotes()`: Newton-Cotes formulas with endpoints
-- `open_newton_cotes()`: Newton-Cotes formulas without endpoints
-- `closed_composite_newton_cotes()`: Composite Newton-Cotes methods
-- `gaussLegendre()`: Gaussian quadrature for high-accuracy integration
+Methods for numerical integration of functions:
+
+- **`closed_newton_cotes(f, a, b, n)`**: Newton-Cotes formulas with endpoints
+
+  - Approximates the definite integral using quadrature weights based on polynomial interpolation through equally spaced points including the endpoints
+  - Parameters:
+    - `f`: The function to integrate (must accept and return array input)
+    - `a`: Lower limit of integration
+    - `b`: Upper limit of integration
+    - `n`: Number of subintervals to use
+  - Returns the approximated value of the integral
+  - Special cases: n=1 is the trapezoidal rule, n=2 is Simpson's rule
+
+- **`open_newton_cotes(f, a, b, n)`**: Newton-Cotes formulas without endpoints
+
+  - Approximates the definite integral using quadrature weights based on polynomial interpolation through equally spaced points excluding the endpoints
+  - Parameters:
+    - `f`: The function to integrate (must accept and return array input)
+    - `a`: Lower limit of integration
+    - `b`: Upper limit of integration
+    - `n`: Number of interior points to use
+  - Returns the approximated value of the integral
+  - Useful for cases where function evaluation at endpoints is problematic
+
+- **`closed_composite_newton_cotes(f, a, b, n, order=1)`**: Composite Newton-Cotes methods
+
+  - Divides the integration interval into n subintervals and applies the closed Newton-Cotes formula of specified order to each subinterval
+  - Parameters:
+    - `f`: The function to integrate (must accept and return array input)
+    - `a`: Lower limit of integration
+    - `b`: Upper limit of integration
+    - `n`: Number of subintervals to divide [a,b] into (must be divisible by the order)
+    - `order`: Order of the Newton-Cotes formula to use in each subinterval (default is 1)
+  - Returns the approximated value of the integral
+  - Special cases: order=1 is the composite trapezoidal rule, order=2 is the composite Simpson's rule
+
+- **`gaussLegendre(f, a, b, n)`**: Gaussian quadrature for high-accuracy integration
+  - Uses Legendre polynomial roots and weights to approximate the integral
+  - Parameters:
+    - `f`: The function to integrate
+    - `a`: Lower limit of integration
+    - `b`: Upper limit of integration
+    - `n`: Number of quadrature points
+  - Returns the approximated value of the integral
+  - Generally provides higher accuracy than Newton-Cotes formulas with the same number of function evaluations
 
 ### Differential Equations (`diff_equations/`)
 
