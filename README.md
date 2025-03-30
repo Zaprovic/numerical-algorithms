@@ -26,45 +26,91 @@ pip install -r requirements.txt
 The `functions` module is organized into the following components:
 
 ### Root Finding (`roots.py`)
-- `bisect()`: Bisection method for finding roots in an interval
-- `fixedpt()`: Fixed-point iteration for finding roots
-- `newton()`: Newton-Raphson method for fast convergence
-- `newtonMod()`: Modified Newton's method for handling multiple roots
+
+Methods for finding roots (zeros) of nonlinear equations:
+
+- **`bisect(f, a, b, delta=1e-6)`**: Bisection method for finding roots in an interval
+
+  - Repeatedly halves an interval and selects the subinterval where the root must lie
+  - Parameters:
+    - `f`: The function for which to find a root
+    - `a`: Left endpoint of the initial interval
+    - `b`: Right endpoint of the initial interval
+    - `delta`: Desired accuracy (default: 1e-6)
+  - Returns a DataFrame showing the steps of the algorithm
+
+- **`fixedpt(g, p0, tol=1e-6, m=100)`**: Fixed-point iteration for finding roots
+
+  - Uses the iteration x\_{n+1} = g(x_n) to converge to a fixed point
+  - Parameters:
+    - `g`: The function for which to find the fixed point
+    - `p0`: Initial approximation
+    - `tol`: Error tolerance (default: 1e-6)
+    - `m`: Maximum iterations (default: 100)
+  - Returns a DataFrame tracking the iteration history
+
+- **`newton(f, x0, delta=1e-6, epsilon=1e-6, m=100)`**: Newton-Raphson method for fast convergence
+
+  - Iteratively improves approximation using x\_{n+1} = x_n - f(x_n)/f'(x_n)
+  - Parameters:
+    - `f`: The function for which to find a root
+    - `x0`: Initial approximation
+    - `delta`: Tolerance for consecutive approximations (default: 1e-6)
+    - `epsilon`: Tolerance for function value (default: 1e-6)
+    - `m`: Maximum iterations (default: 100)
+  - Returns the approximated root, error estimate, iteration count, and function value
+
+- **`newtonMod(f, x0, delta=1e-6, epsilon=1e-6, m=100)`**: Modified Newton's method for multiple roots
+  - Uses higher-order derivatives to improve convergence for multiple roots
+  - Parameters:
+    - `f`: The function for which to find a root
+    - `x0`: Initial approximation
+    - `delta`: Tolerance for consecutive approximations (default: 1e-6)
+    - `epsilon`: Tolerance for function value (default: 1e-6)
+    - `m`: Maximum iterations (default: 100)
+  - Returns the approximated root, error estimate, iteration count, and function value
+  - Particularly effective for multiple roots where standard Newton's method converges slowly
 
 ### Linear Systems (`linear.py`)
+
 - `jacobi()`: Jacobi iterative method
 - `gseid()`: Gauss-Seidel iterative method
 - `sor()`: Successive Over-Relaxation method
 
 ### Interpolation (`interp.py` and `cb_spline.py`)
+
 - `lagrange()`: Lagrange polynomial interpolation
 - `newtonpoly()`: Newton's divided differences method
 - `chebyshevNodes()`: Generates Chebyshev nodes for optimal interpolation
 - `CubicSpline`: Class implementing cubic spline interpolation with various boundary conditions
 
 ### Numerical Integration (`integration.py`)
+
 - `closed_newton_cotes()`: Newton-Cotes formulas with endpoints
 - `open_newton_cotes()`: Newton-Cotes formulas without endpoints
 - `closed_composite_newton_cotes()`: Composite Newton-Cotes methods
 - `gaussLegendre()`: Gaussian quadrature for high-accuracy integration
 
 ### Differential Equations (`diff_equations/`)
+
 - Initial Value Problems (`pvi.py`):
   - `scalar_ode()`: Methods for solving scalar ODEs
   - `vector_ode()`: Methods for solving systems of ODEs
   - Includes Euler, Modified Euler, Heun, Midpoint and RK4 methods
-  
 - Boundary Value Problems (`boundary_value.py`):
   - `linear_shot()`: Linear shooting method
   - `finite_differences()`: Finite difference method
 
 ### Partial Differential Equations (`partial/`)
+
 - Parabolic PDEs (`parabolic.py`):
+
   - `forward()`: Explicit forward-difference method
   - `backward()`: Implicit backward-difference method
   - `crnich()`: Crank-Nicolson method
 
 - Hyperbolic PDEs (`hyperbolic.py`):
+
   - `forward()`: Forward method for wave equations
   - `enhanced_forward()`: Enhanced stability forward method
 
@@ -74,6 +120,7 @@ The `functions` module is organized into the following components:
 ## Usage Examples
 
 ### Root Finding
+
 ```python
 import numpy as np
 from functions.roots import bisect, newton
@@ -91,6 +138,7 @@ print(f"Root found: {root}, after {iterations} iterations")
 ```
 
 ### Numerical Integration
+
 ```python
 import numpy as np
 from functions.integration import gaussLegendre, closed_newton_cotes
@@ -109,6 +157,7 @@ print(f"Newton-Cotes result: {result_nc}")
 ```
 
 ### Differential Equations
+
 ```python
 import numpy as np
 from functions.diff_equations.pvi import scalar_ode
@@ -122,6 +171,7 @@ print(f"Solution at t=5: {y[-1]}")  # Should be close to e^(-5)
 ```
 
 ### Cubic Spline Interpolation
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -149,6 +199,7 @@ plt.show()
 ```
 
 ### Partial Differential Equations
+
 ```python
 import numpy as np
 from functions.partial.parabolic import crnich
@@ -170,7 +221,7 @@ t_range = (0, 0.5)
 h = 0.05  # spatial step
 k = 0.01  # time step
 
-solution = crnich(initial_temp, alpha, boundary_left, boundary_right, 
+solution = crnich(initial_temp, alpha, boundary_left, boundary_right,
                   x_range[0], x_range[1], t_range[0], t_range[1], h, k, plot=True)
 ```
 
