@@ -41,7 +41,7 @@ Methods for finding roots (zeros) of nonlinear equations:
 
 - **`fixedpt(g, p0, tol=1e-6, m=100)`**: Fixed-point iteration for finding roots
 
-  - Uses the iteration x\_{n+1} = g(x_n) to converge to a fixed point
+  - Uses the iteration $x_{n+1} = g(x_n)$ to converge to a fixed point
   - Parameters:
     - `g`: The function for which to find the fixed point
     - `p0`: Initial approximation
