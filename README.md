@@ -328,7 +328,7 @@ h = 0.05  # spatial step
 k = 0.01  # time step
 
 solution = crnich(initial_temp, alpha, boundary_left, boundary_right,
-                  x_range[0], x_range[1], t_range[0], t_range[1], h, k, plot=True)
+  x_range[0], x_range[1], t_range[0], t_range[1], h, k, plot=True)
 ```
 
 ## Dependencies
@@ -365,8 +365,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Burden, R. L., & Faires, J. D. (2010). Numerical Analysis (9th ed.). Brooks/Cole.
 - Heath, M. T. (2018). Scientific Computing: An Introductory Survey (3rd ed.). SIAM.
 - Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007). Numerical Recipes: The Art of Scientific Computing (3rd ed.). Cambridge University Press.
-
-## Acknowledgments
-
-- Inspired by classic numerical methods textbooks
-- Thanks to all contributors who have helped improve this library
