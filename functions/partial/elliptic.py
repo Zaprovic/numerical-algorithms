@@ -1,10 +1,25 @@
+from typing import Callable, Union
+
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.sparse import block_diag, bmat, csr_matrix, diags, lil_matrix
+from scipy.sparse import csr_matrix, diags, lil_matrix
 from scipy.sparse.linalg import spsolve
 
 
-def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k, plot=None):
+def findiff(
+    f: Callable[[float, float], float],
+    g1: Callable[[float], Union[float, np.ndarray]],
+    g2: Callable[[float], Union[float, np.ndarray]],
+    h1: Callable[[float], Union[float, np.ndarray]],
+    h2: Callable[[float], Union[float, np.ndarray]],
+    xa: float,
+    xb: float,
+    ya: float,
+    yb: float,
+    h: float,
+    k: float,
+    plot=None,
+):
     """
     Elliptic partial differential equation in the form
                 uxx + uyy = f(x,y),     xa<=x<=xb, ya<=y<=yb
@@ -13,7 +28,7 @@ def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k, plot=None):
 
     Parameters
     ----------
-    plot: If not None, then it will shoe 3D surface plot
+    plot: If not None, then it will show 3D surface plot
     f: function f(x,y)
     g1: g1(y) --> boundary condition for u(xa, y)
     g2: g2(y) --> boundary condition for u(xb, y)
@@ -30,76 +45,106 @@ def findiff(f, g1, g2, h1, h2, xa, xb, ya, yb, h, k, plot=None):
     -------
     """
 
-    N = int((xb - xa) / h)
-    M = int((yb - ya) / k)
+    # Calculate number of interior points
+    N = int((xb - xa) / h) - 1  # Interior points in x-direction
+    M = int((yb - ya) / k) - 1  # Interior points in y-direction
 
-    x = np.linspace(xa, xb, N + 1)
-    y = np.linspace(ya, yb, M + 1)
-    w = lil_matrix((len(x), len(y)), dtype=float)
+    # Create grid points
+    x = np.linspace(xa, xb, N + 2)  # Include boundary points
+    y = np.linspace(ya, yb, M + 2)  # Include boundary points
 
-    w[0] = g1(y)
-    w[-1] = g2(y)
+    # Initialize solution matrix
+    w = np.zeros((len(x), len(y)))
 
-    w[1:-1, 0] = h1(x[1:-1])
-    w[1:-1, -1] = h2(x[1:-1])
+    # Apply boundary conditions
+    w[0, :] = g1(y)  # Left boundary: u(xa, y)
+    w[-1, :] = g2(y)  # Right boundary: u(xb, y)
+    w[:, 0] = h1(x)  # Bottom boundary: u(x, ya)
+    w[:, -1] = h2(x)  # Top boundary: u(x, yb)
 
-    l = np.power(h / k, 2)
+    # Total number of interior points
+    n_interior = N * M
 
-    trd = diags([-2 * (1 + l), 1, 1], [0, -1, 1], shape=(N - 1, N - 1), format="csr")
-    off = diags([l, 0, 0], [0, -1, 1], shape=(N - 1, N - 1), format="csr")
+    if n_interior == 0:
+        print("No interior points to solve")
+        return w
 
-    T = csr_matrix(
-        bmat(
-            [
-                [None] * (M - 1 - M) + [trd, off] + [None] * (M - 1 - 2),
-                *[
-                    [None] * (i - 3) + [off, trd, off] + [None] * (M - 1 - i)
-                    for i in range(3, M)
-                ],
-                [None] * (M - 1 - 2) + [off, trd] + [None] * (M - 1 - M),
-            ]
-        )
-    )
+    # Create coefficient matrix A for the linear system Au = b
+    A = lil_matrix((n_interior, n_interior))
+    b = np.zeros(n_interior)
 
-    # vector to store the solutions for f(xi,yj)
-    F = (
-        csr_matrix([f(x[i], y[j]) for j in range(1, M) for i in range(1, N)])
-        .toarray()
-        .ravel()
-    )
+    # Coefficients for the finite difference stencil
+    alpha = k**2 / h**2
+    beta = h**2 / k**2
+    gamma = -2 * (1 + alpha)
 
-    G = (
-        csr_matrix(
-            [
-                [w[0, 1] + l * w[1, 0]]
-                + [0 + l * w[i, 0] for i in range(2, N - 1)]
-                + [w[N, 1] + l * w[N - 1, 0]],
-                *[
-                    [w[0, j]] + [0 for _ in range(2, N - 1)] + [w[N, 2]]
-                    for j in range(2, M - 1)
-                ],
-                [w[0, 3] + l * w[1, M]]
-                + [0 + l * w[i, M] for i in range(2, N - 1)]
-                + [w[N, M - 1] + l * w[N - 1, M]],
-            ]
-        )
-        .toarray()
-        .reshape(((N - 1) * (M - 1)))
-    )
+    # Fill the coefficient matrix using lexicographic ordering
+    # Interior points are numbered: (i,j) -> i*M + j for i=1...N, j=1...M
+    for i in range(1, N + 1):
+        for j in range(1, M + 1):
+            row = (i - 1) * M + (j - 1)  # Current point index
 
-    S = np.power(h, 2) * F - G
+            # Central point coefficient
+            A[row, row] = gamma
 
-    xs = lil_matrix(spsolve(T, S)).reshape((M - 1, N - 1)).transpose()
-    w[1:-1, 1:-1] = xs
+            # Left neighbor (i-1, j)
+            if i > 1:
+                col = (i - 2) * M + (j - 1)
+                A[row, col] = alpha
+            else:
+                # Boundary contribution
+                b[row] -= alpha * w[0, j]
 
+            # Right neighbor (i+1, j)
+            if i < N:
+                col = i * M + (j - 1)
+                A[row, col] = alpha
+            else:
+                # Boundary contribution
+                b[row] -= alpha * w[N + 1, j]
+
+            # Bottom neighbor (i, j-1)
+            if j > 1:
+                col = (i - 1) * M + (j - 2)
+                A[row, col] = beta
+            else:
+                # Boundary contribution
+                b[row] -= beta * w[i, 0]
+
+            # Top neighbor (i, j+1)
+            if j < M:
+                col = (i - 1) * M + j
+                A[row, col] = beta
+            else:
+                # Boundary contribution
+                b[row] -= beta * w[i, M + 1]
+
+            # Right-hand side from source term
+            b[row] += h**2 * f(x[i], y[j])
+
+    # Convert to CSR format for efficient solving
+    A = A.tocsr()
+
+    # Solve the linear system
+    u_interior = spsolve(A, b)
+
+    # Place interior solution back into the grid
+    for i in range(1, N + 1):
+        for j in range(1, M + 1):
+            idx = (i - 1) * M + (j - 1)
+            w[i, j] = u_interior[idx]
+
+    # Plot if requested
     if plot is not None:
         X, Y = np.meshgrid(x, y)
-        fig = plt.figure()
+        fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111, projection="3d")
-        ax.plot_surface(X, Y, w.toarray().T, cmap="plasma")
+        surf = ax.plot_surface(X, Y, w.T, cmap="plasma", alpha=0.8)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.set_zlabel("u(x, y)")
+        ax.set_title("Solution of 2D Poisson Equation")
+        plt.colorbar(surf)
         plt.show()
 
-    return T
+    return w

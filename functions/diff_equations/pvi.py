@@ -1,16 +1,8 @@
+from typing import (Callable, Dict, Generic, Literal, Protocol, Tuple, TypeVar,
+                    Union)
+
 import numpy as np
 import numpy.typing as npt
-from typing import (
-    Callable,
-    Tuple,
-    Literal,
-    Union,
-    TypeVar,
-    Generic,
-    Any,
-    Dict,
-    Protocol,
-)
 
 np.set_printoptions(precision=4, suppress=True)
 

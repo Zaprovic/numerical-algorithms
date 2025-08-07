@@ -1,6 +1,7 @@
+from typing import Literal, Optional, Tuple, Union
+
 import numpy as np
 import numpy.typing as npt
-from typing import Literal, Optional, Union, Tuple
 from scipy.sparse import diags
 
 np.set_printoptions(precision=4)
@@ -143,8 +144,7 @@ class CubicSpline:
 
         elif self.bc_type == "clamped":
             if self.f1 is None or self.f2 is None:
-                raise ValueError(
-                    "bc_type='clamped' needs f1, f2 (end derivatives).")
+                raise ValueError("bc_type='clamped' needs f1, f2 (end derivatives).")
             B[0] = (
                 3 * (self.y[2] - self.y[1]) / h[1]
                 - 3 * (self.y[1] - self.y[0]) / h[0]
@@ -164,12 +164,10 @@ class CubicSpline:
 
         elif self.bc_type == "known":
             if self.f1 is None or self.f2 is None:
-                raise ValueError(
-                    "bc_type='known' (known curvature) needs f1, f2.")
+                raise ValueError("bc_type='known' (known curvature) needs f1, f2.")
 
             B[0] = (
-                3.0 * ((self.y[2] - self.y[1]) / h[1] -
-                       (self.y[1] - self.y[0]) / h[0])
+                3.0 * ((self.y[2] - self.y[1]) / h[1] - (self.y[1] - self.y[0]) / h[0])
                 - self.f1 * h[0] / 2.0
             )
             B[-1] = (
@@ -258,8 +256,7 @@ class CubicSpline:
             )
 
         elif self.bc_type == "extrapolated":
-            c0 = c_interior[0] - (h[0] / h[1]) * \
-                (c_interior[1] - c_interior[0])
+            c0 = c_interior[0] - (h[0] / h[1]) * (c_interior[1] - c_interior[0])
             cN = c_interior[n - 2] + (h[n - 1] / h[n - 2]) * (
                 c_interior[n - 2] - c_interior[n - 3]
             )

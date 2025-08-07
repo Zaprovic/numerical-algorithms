@@ -1,8 +1,9 @@
+from typing import Callable
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
-from typing import Callable
 
 
 def forward(

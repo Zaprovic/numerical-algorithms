@@ -1,6 +1,8 @@
-import numpy as np
-from .pvi import vector_ode as sd
 from typing import Callable, Tuple
+
+import numpy as np
+
+from .pvi import vector_ode as sd
 
 
 def linear_shot(

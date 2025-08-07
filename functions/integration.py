@@ -1,6 +1,7 @@
+from typing import Any, Callable, TypeVar, Union
+
 import numpy as np
 from scipy.special import roots_legendre
-from typing import Callable, Union, TypeVar, Any
 
 np.set_printoptions(precision=4)
 
